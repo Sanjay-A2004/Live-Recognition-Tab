@@ -11,6 +11,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import tensorflow as tf
 import dlib
 import os
+import gdown
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -24,7 +25,16 @@ DB_CONFIG = {
     "database": "attendance_system",
 }
 
+# Download large model from Google Drive if not present
+MODEL_FILE = "anti_spoofing_model_xception.h5"
+MODEL_DRIVE_ID = "175ye_3XnyohYZrLQjfTwcBVYsGltnH4v"  # Replace with your actual file ID
+
+if not os.path.exists(MODEL_FILE):
+    gdown.download(f"https://drive.google.com/uc?id={MODEL_DRIVE_ID}", MODEL_FILE, quiet=False)
+
 # Load class schedule
+@st.cache_data
+
 def load_schedule():
     return pd.read_csv("schedule.csv")
 
@@ -39,7 +49,7 @@ try:
     with open("known_face_labels.pkl", "rb") as f:
         known_labels = pickle.load(f)
 
-    spoof_model = tf.keras.models.load_model("anti_spoofing_model_xception.h5")
+    spoof_model = tf.keras.models.load_model(MODEL_FILE)
 except Exception as e:
     st.error(f"❌ Error loading models: {e}")
     st.stop()
@@ -49,6 +59,7 @@ PREDICTOR_PATH = "shape_predictor_68_face_landmarks.dat"
 if not os.path.exists(PREDICTOR_PATH):
     st.error("❌ Missing 'shape_predictor_68_face_landmarks.dat'. Please download it.")
     st.stop()
+
 
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(PREDICTOR_PATH)
