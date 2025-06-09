@@ -1,0 +1,11 @@
+streamlit
+face_recognition
+opencv-python-headless
+numpy
+pandas
+tensorflow
+dlib
+scikit-learn
+python-dotenv
+mysql-connector-python
+gdown
